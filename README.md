@@ -26,6 +26,6 @@
 
 - db 구조
 
-> - supabase 가 기본 제공하는 postgresql db 를 키밸류 형식의 NoSQL 처럼 사용
-> - id, key, data 컬럼을 설정, id 는 primary key 로 uuid 형식으로 자동 기록
-> - key와 data 컬럼은 TEXT[] 형태, key 는 ["department", "user id", "status or user", "excel row"] 형태의 값을, data 에는 부서관리자가 지정하는 항목들 순서대로의 값을 저장하도록 하되, data 컬럼의 첫번째 값은 "user id" 가 되도록 함
+> - "id": int8, "key": jsonb, "value": text[] 컬럼 설정
+> - - "key" 는 department: text, table: "user" | "status", userid: text, row: int4 의 프라퍼티 설정, 각각 "부서", "자료종류", "사번", "엑셀 행 위치" 를 나타냄
+> - - "value" 는 엑셀 row 행 위치의 가장 왼쪽열부터의 값 순서
