@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8" />
+        <title>collect-tool deno kv viewer</title>
+    </head>
+    <body>
+        <div style="display: flex; column-gap: 3rem;">
+            <form id="form" style="display: contents;">
+                <div><label>인증번호: </label><input name="auth" type="password" /></div>
+                <div><label>명령어: </label>
+                    <select name="command">
+                        <option value="list">list</option>
+                    </select>
+                </div>
+                <div><label>키: </label><input name="key" type="text" /></div>
+                <div><label>밸류: </label><input name="value" type="text" /></div>
+                <div><button type="submit" style="cursor: pointer;">실행</button></div>
+            </form>
+        </div>
+        <hr />
+        <div id="output"></div>
+        <script>
+            "use strict";
+
+            const $output = document.getElementById("output");
+            const $form = document.getElementById("form");
+            $form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const formdata = new FormData(form);
+                const auth = formdata.get("auth");
+                const command = formdata.get("command");
+                const key = formdata.get("key");
+                const value = formdata.get("value");
+
+                // console.log(auth, command, key, value);
+                $output.replaceChildren();
+                const res = await (async () => {
+                    try {
+                        const r = await fetch("/viewer", {
+                            method: "POST",
+                            body: JSON.stringify({ auth, command, key, value }),
+                        });
+                        return await r.json();
+                    } catch (err) {
+                        console.log(err.message);
+                        return { code: "error", message: err.message, data: null };
+                    }
+                })();
+                if (res.code === "error") {
+                    const div = document.createElement("div");
+                    div.innerText = res.message;
+                    $output.appendChild(div);
+                    return;
+                }
+                if (res.data.length === 0) {
+                    const div = document.createElement("div");
+                    div.innerText = "Nothing in KV";
+                    $output.appendChild(div);
+                    return;
+                }
+
+                for (const x of res.data) {
+                    const div = document.createElement("div");
+                    div.innerText = `key: ${x?.key} ===> value: ${x?.value}`;
+                }
+            });
+            
+        </script>
+    </body>
+</html>
